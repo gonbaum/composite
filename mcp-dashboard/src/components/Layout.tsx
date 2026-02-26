@@ -1,12 +1,18 @@
 import { NavLink, Outlet } from "react-router-dom";
-import { Zap, Key, Clock } from "lucide-react";
+import { Zap, Key, Clock, LogOut } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
+import { Button } from "@/components/ui/button";
 
 const navItems = [
   { to: "/", label: "Actions", icon: Zap },
   { to: "/auth", label: "Credentials", icon: Key },
   { to: "/history", label: "History", icon: Clock },
 ];
+
+async function handleLogout() {
+  await fetch("/api/logout", { method: "POST" });
+  window.location.reload();
+}
 
 export default function Layout() {
   return (
@@ -33,6 +39,12 @@ export default function Layout() {
             {label}
           </NavLink>
         ))}
+        <div className="mt-auto">
+          <Button variant="ghost" size="sm" className="w-full justify-start gap-2" onClick={handleLogout}>
+            <LogOut className="h-4 w-4" />
+            Logout
+          </Button>
+        </div>
       </aside>
       <main className="flex-1 overflow-auto p-6">
         <Outlet />

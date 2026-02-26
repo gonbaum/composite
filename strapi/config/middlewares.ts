@@ -1,5 +1,11 @@
 import type { Core } from '@strapi/strapi';
 
+const corsOrigins = [
+  'http://localhost:5173',
+  'http://localhost:1337',
+  ...(process.env.DASHBOARD_URL ? [process.env.DASHBOARD_URL] : []),
+];
+
 const config: Core.Config.Middlewares = [
   'strapi::logger',
   'strapi::errors',
@@ -7,7 +13,7 @@ const config: Core.Config.Middlewares = [
   {
     name: 'strapi::cors',
     config: {
-      origin: ['http://localhost:5173', 'http://localhost:1337'],
+      origin: corsOrigins,
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'],
       headers: ['Content-Type', 'Authorization', 'Origin', 'Accept'],
       keepHeaderOnError: true,
