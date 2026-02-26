@@ -49,15 +49,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   // Build the target URL
-  console.log("req.query:", JSON.stringify(req.query));
-  const pathSegments = req.query.path;
+  const pathSegments = req.query["...path"];
   const path = Array.isArray(pathSegments) ? pathSegments.join("/") : pathSegments || "";
-  console.log("pathSegments:", pathSegments, "path:", path);
 
   // Rebuild query string excluding the catch-all "path" param
   const params = new URLSearchParams();
   for (const [key, value] of Object.entries(req.query)) {
-    if (key === "path") continue;
+    if (key === "...path") continue;
     if (Array.isArray(value)) {
       value.forEach((v) => params.append(key, v));
     } else if (value !== undefined) {
@@ -83,7 +81,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const upstream = await fetch(targetUrl, fetchOptions);
 
-  console.log("targetUrl:", targetUrl, "status:", upstream.status);
   const contentType = upstream.headers.get("content-type") ?? "";
   if (!contentType.includes("application/json")) {
     const text = await upstream.text();
