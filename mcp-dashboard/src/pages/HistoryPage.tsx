@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { ChevronDown, ChevronRight, Globe, Terminal, Layers, RefreshCw } from "lucide-react";
+import { ChevronDown, ChevronRight, Globe, Terminal, Layers, RefreshCw, Monitor, Server } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -55,22 +55,24 @@ export default function HistoryPage() {
   const [loading, setLoading] = useState(true);
   const [nameFilter, setNameFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [sourceFilter, setSourceFilter] = useState<string>("all");
   const [expandedId, setExpandedId] = useState<number | null>(null);
 
   const load = useCallback(async () => {
     try {
       setLoading(true);
-      const filters: { action_name?: string; success?: boolean } = {};
+      const filters: { action_name?: string; success?: boolean; source?: string } = {};
       if (nameFilter !== "all") filters.action_name = nameFilter;
       if (statusFilter === "success") filters.success = true;
       if (statusFilter === "fail") filters.success = false;
+      if (sourceFilter !== "all") filters.source = sourceFilter;
       setLogs(await getActionLogs(filters));
     } catch (err) {
       console.error("Failed to load logs:", err);
     } finally {
       setLoading(false);
     }
-  }, [nameFilter, statusFilter]);
+  }, [nameFilter, statusFilter, sourceFilter]);
 
   useEffect(() => {
     getActions()
@@ -118,6 +120,17 @@ export default function HistoryPage() {
             <SelectItem value="fail">Failed</SelectItem>
           </SelectContent>
         </Select>
+
+        <Select value={sourceFilter} onValueChange={setSourceFilter}>
+          <SelectTrigger>
+            <SelectValue placeholder="All sources" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All sources</SelectItem>
+            <SelectItem value="dashboard">Dashboard</SelectItem>
+            <SelectItem value="mcp">MCP</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       {loading ? (
@@ -132,6 +145,7 @@ export default function HistoryPage() {
               <TableHead>Timestamp</TableHead>
               <TableHead>Action</TableHead>
               <TableHead>Type</TableHead>
+              <TableHead>Source</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Duration</TableHead>
               <TableHead>HTTP</TableHead>
@@ -166,6 +180,23 @@ export default function HistoryPage() {
                       </span>
                     </TableCell>
                     <TableCell>
+                      {log.source === "dashboard" ? (
+                        <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium bg-cyan-100 text-cyan-700 dark:bg-cyan-950 dark:text-cyan-400">
+                          <Monitor className="h-3 w-3" />
+                          dashboard
+                        </span>
+                      ) : log.source === "mcp" ? (
+                        <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400">
+                          <Server className="h-3 w-3" />
+                          mcp
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400">
+                          unknown
+                        </span>
+                      )}
+                    </TableCell>
+                    <TableCell>
                       {log.success ? (
                         <Badge className="bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400">
                           Success
@@ -183,7 +214,7 @@ export default function HistoryPage() {
                   </TableRow>
                   {expanded && (
                     <TableRow key={`${log.id}-detail`}>
-                      <TableCell colSpan={7} className="bg-muted/30 p-4">
+                      <TableCell colSpan={8} className="bg-muted/30 p-4">
                         <div className="grid grid-cols-2 gap-4">
                           <div>
                             <h4 className="text-xs font-semibold uppercase text-muted-foreground mb-1">

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, X, ArrowUpFromLine } from "lucide-react";
+import { Plus, X, ArrowUpFromLine, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import KeyValueEditor from "@/components/KeyValueEditor";
+import TestModal from "@/components/TestModal";
 import type { Action, CompositeConfig, CompositeStep, Parameter } from "@/types";
 
 interface Props {
@@ -50,6 +51,7 @@ export default function CompositeConfigFields({
     candidates: [],
   });
   const [selectedToPromote, setSelectedToPromote] = useState<Set<string>>(new Set());
+  const [testAction, setTestAction] = useState<Action | null>(null);
 
   const updateStep = (idx: number, patch: Partial<CompositeStep>) => {
     const steps = value.steps.map((s, i) => (i === idx ? { ...s, ...patch } : s));
@@ -148,16 +150,29 @@ export default function CompositeConfigFields({
           <div key={i} className="border rounded-md p-3 space-y-2">
             <div className="flex items-center justify-between">
               <Label className="text-sm font-medium">Step {i + 1}</Label>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                onClick={() =>
-                  onChange({ ...value, steps: value.steps.filter((_, j) => j !== i) })
-                }
-              >
-                <X className="h-4 w-4" />
-              </Button>
+              <div className="flex items-center gap-1">
+                {selected && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    title="Test this step"
+                    onClick={() => setTestAction(selected)}
+                  >
+                    <Play className="h-4 w-4" />
+                  </Button>
+                )}
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() =>
+                    onChange({ ...value, steps: value.steps.filter((_, j) => j !== i) })
+                  }
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
             <div className="space-y-1">
               <Label className="text-xs">Action</Label>
@@ -202,6 +217,8 @@ export default function CompositeConfigFields({
       >
         <Plus className="mr-1 h-3 w-3" /> Add Step
       </Button>
+
+      <TestModal action={testAction} onClose={() => setTestAction(null)} />
 
       {/* Promote parameters dialog */}
       <Dialog open={promoteDialog.open} onOpenChange={(open) => { if (!open) handlePromoteCancel(); }}>

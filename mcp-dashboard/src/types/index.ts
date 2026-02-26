@@ -101,6 +101,7 @@ export interface ActionLog {
   error_message: string | null;
   duration_ms: number | null;
   status_code: number | null;
+  source: "dashboard" | "mcp" | "unknown";
   createdAt: string;
 }
 

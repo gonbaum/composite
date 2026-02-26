@@ -18,6 +18,7 @@ async function executeAction(actionName, params) {
   const result = await strapiRequest("POST", "/api/actions/execute", {
     action: actionName,
     params,
+    source: "mcp",
   });
 
   // API actions: Strapi already executed, pass through

@@ -145,7 +145,7 @@ function handleCompositeResolution(actionDef: any, resolvedParams: Record<string
 
 export default factories.createCoreController("api::action.action", ({ strapi }) => ({
   async execute(ctx) {
-    const { action: actionName, params = {} } = ctx.request.body as any;
+    const { action: actionName, params = {}, source } = ctx.request.body as any;
 
     if (!actionName) {
       return ctx.badRequest("Missing required field: action");
@@ -213,6 +213,7 @@ export default factories.createCoreController("api::action.action", ({ strapi })
         error_message: result.error ? (typeof result.error === "string" ? result.error : JSON.stringify(result.error)) : null,
         duration_ms,
         status_code: result.status || null,
+        source: source || "unknown",
       },
     }).catch(() => {});
 

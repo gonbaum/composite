@@ -458,6 +458,8 @@ export interface ApiActionLogActionLog extends Struct.CollectionTypeSchema {
     params: Schema.Attribute.JSON;
     publishedAt: Schema.Attribute.DateTime;
     response: Schema.Attribute.JSON;
+    source: Schema.Attribute.Enumeration<['dashboard', 'mcp', 'unknown']> &
+      Schema.Attribute.DefaultTo<'unknown'>;
     status_code: Schema.Attribute.Integer;
     success: Schema.Attribute.Boolean;
     updatedAt: Schema.Attribute.DateTime;

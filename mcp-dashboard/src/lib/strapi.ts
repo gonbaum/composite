@@ -55,7 +55,7 @@ export async function deleteAction(documentId: string): Promise<void> {
 }
 
 export async function executeAction(actionName: string, params: Record<string, unknown>): Promise<unknown> {
-  return await request("POST", "/api/actions/execute", { action: actionName, params });
+  return await request("POST", "/api/actions/execute", { action: actionName, params, source: "dashboard" });
 }
 
 // Auth Credentials
@@ -87,6 +87,7 @@ export async function deleteAuthCredential(documentId: string): Promise<void> {
 export async function getActionLogs(filters?: {
   action_name?: string;
   success?: boolean;
+  source?: string;
 }): Promise<ActionLog[]> {
   const params = new URLSearchParams({
     "sort": "createdAt:desc",
@@ -98,6 +99,9 @@ export async function getActionLogs(filters?: {
   }
   if (filters?.success !== undefined) {
     params.set("filters[success][$eq]", String(filters.success));
+  }
+  if (filters?.source) {
+    params.set("filters[source][$eq]", filters.source);
   }
 
   const res = await request<StrapiResponse<ActionLog[]>>("GET", `/api/action-logs?${params}`);
