@@ -65,6 +65,19 @@ async function handleApiExecution(actionDef: any, resolvedParams: Record<string,
     }
 
     const response = await fetch(url!, fetchOptions);
+    const contentType = response.headers.get("content-type") || "";
+
+    if (response.ok && contentType.startsWith("image/")) {
+      const buffer = Buffer.from(await response.arrayBuffer());
+      const base64 = buffer.toString("base64");
+      return {
+        action_type: "api",
+        success: true,
+        status: response.status,
+        image: { data: base64, mimeType: contentType.split(";")[0] },
+      };
+    }
+
     const responseText = await response.text();
 
     let data: any;
@@ -170,15 +183,39 @@ export default factories.createCoreController("api::action.action", ({ strapi })
 
     const actionType = actionDef.action_type || "api";
 
+    const start = Date.now();
+    let result: any;
+
     switch (actionType) {
       case "api":
-        return await handleApiExecution(actionDef, resolvedParams);
+        result = await handleApiExecution(actionDef, resolvedParams);
+        break;
       case "bash":
-        return handleBashResolution(actionDef, resolvedParams);
+        result = handleBashResolution(actionDef, resolvedParams);
+        break;
       case "composite":
-        return handleCompositeResolution(actionDef, resolvedParams);
+        result = handleCompositeResolution(actionDef, resolvedParams);
+        break;
       default:
         return ctx.badRequest(`Unknown action_type: ${actionType}`);
     }
+
+    const duration_ms = Date.now() - start;
+
+    // Fire-and-forget audit log
+    strapi.documents("api::action-log.action-log").create({
+      data: {
+        action_name: actionName,
+        action_type: actionType,
+        params: resolvedParams,
+        response: result,
+        success: result.success !== false,
+        error_message: result.error ? (typeof result.error === "string" ? result.error : JSON.stringify(result.error)) : null,
+        duration_ms,
+        status_code: result.status || null,
+      },
+    }).catch(() => {});
+
+    return result;
   },
 }));

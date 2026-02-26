@@ -1,0 +1,42 @@
+{
+  "kind": "collectionType",
+  "collectionName": "action_logs",
+  "info": {
+    "singularName": "action-log",
+    "pluralName": "action-logs",
+    "displayName": "Action Log",
+    "description": "Audit log of action executions"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "action_name": {
+      "type": "string",
+      "required": true
+    },
+    "action_type": {
+      "type": "enumeration",
+      "enum": ["api", "bash", "composite"]
+    },
+    "params": {
+      "type": "json"
+    },
+    "response": {
+      "type": "json"
+    },
+    "success": {
+      "type": "boolean"
+    },
+    "error_message": {
+      "type": "text"
+    },
+    "duration_ms": {
+      "type": "integer"
+    },
+    "status_code": {
+      "type": "integer"
+    }
+  }
+}

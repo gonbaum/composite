@@ -1,4 +1,4 @@
-import type { Action, AuthCredential, StrapiResponse } from "@/types";
+import type { Action, ActionLog, AuthCredential, StrapiResponse } from "@/types";
 
 const STRAPI_URL = import.meta.env.VITE_STRAPI_URL || "http://localhost:1337";
 const STRAPI_TOKEN = import.meta.env.VITE_STRAPI_TOKEN;
@@ -81,4 +81,25 @@ export async function updateAuthCredential(documentId: string, data: unknown): P
 
 export async function deleteAuthCredential(documentId: string): Promise<void> {
   await request("DELETE", `/api/auth-credentials/${documentId}`);
+}
+
+// Action Logs
+export async function getActionLogs(filters?: {
+  action_name?: string;
+  success?: boolean;
+}): Promise<ActionLog[]> {
+  const params = new URLSearchParams({
+    "sort": "createdAt:desc",
+    "pagination[pageSize]": "50",
+  });
+
+  if (filters?.action_name) {
+    params.set("filters[action_name][$eq]", filters.action_name);
+  }
+  if (filters?.success !== undefined) {
+    params.set("filters[success][$eq]", String(filters.success));
+  }
+
+  const res = await request<StrapiResponse<ActionLog[]>>("GET", `/api/action-logs?${params}`);
+  return res.data;
 }

@@ -116,6 +116,19 @@ server.tool(
     try {
       const result = await executeAction(action, params);
 
+      // Image response: return as MCP image content
+      if (result.image && result.image.data && result.image.mimeType) {
+        return {
+          content: [
+            {
+              type: "image",
+              data: result.image.data,
+              mimeType: result.image.mimeType,
+            },
+          ],
+        };
+      }
+
       return {
         content: [
           {

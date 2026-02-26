@@ -1,10 +1,11 @@
 import { NavLink, Outlet } from "react-router-dom";
-import { Zap, Key } from "lucide-react";
+import { Zap, Key, Clock } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 
 const navItems = [
   { to: "/", label: "Actions", icon: Zap },
   { to: "/auth", label: "Credentials", icon: Key },
+  { to: "/history", label: "History", icon: Clock },
 ];
 
 export default function Layout() {

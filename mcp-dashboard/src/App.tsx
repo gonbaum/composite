@@ -5,6 +5,7 @@ import CreateActionPage from "@/pages/CreateActionPage";
 import EditActionPage from "@/pages/EditActionPage";
 import AuthPage from "@/pages/AuthPage";
 import CreateAuthPage from "@/pages/CreateAuthPage";
+import HistoryPage from "@/pages/HistoryPage";
 
 export default function App() {
   return (
@@ -17,6 +18,7 @@ export default function App() {
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/auth/new" element={<CreateAuthPage />} />
           <Route path="/auth/:documentId/edit" element={<CreateAuthPage />} />
+          <Route path="/history" element={<HistoryPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

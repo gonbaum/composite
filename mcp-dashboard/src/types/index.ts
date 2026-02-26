@@ -90,6 +90,20 @@ export interface ActionFormData {
   enabled: boolean;
 }
 
+export interface ActionLog {
+  id: number;
+  documentId: string;
+  action_name: string;
+  action_type: ActionType;
+  params: Record<string, unknown> | null;
+  response: Record<string, unknown> | null;
+  success: boolean;
+  error_message: string | null;
+  duration_ms: number | null;
+  status_code: number | null;
+  createdAt: string;
+}
+
 export interface AuthFormData {
   name: string;
   display_name: string;

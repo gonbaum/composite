@@ -430,6 +430,42 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiActionLogActionLog extends Struct.CollectionTypeSchema {
+  collectionName: 'action_logs';
+  info: {
+    description: 'Audit log of action executions';
+    displayName: 'Action Log';
+    pluralName: 'action-logs';
+    singularName: 'action-log';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    action_name: Schema.Attribute.String & Schema.Attribute.Required;
+    action_type: Schema.Attribute.Enumeration<['api', 'bash', 'composite']>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    duration_ms: Schema.Attribute.Integer;
+    error_message: Schema.Attribute.Text;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::action-log.action-log'
+    > &
+      Schema.Attribute.Private;
+    params: Schema.Attribute.JSON;
+    publishedAt: Schema.Attribute.DateTime;
+    response: Schema.Attribute.JSON;
+    status_code: Schema.Attribute.Integer;
+    success: Schema.Attribute.Boolean;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiActionAction extends Struct.CollectionTypeSchema {
   collectionName: 'actions';
   info: {
@@ -1028,6 +1064,7 @@ declare module '@strapi/strapi' {
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
+      'api::action-log.action-log': ApiActionLogActionLog;
       'api::action.action': ApiActionAction;
       'api::auth-credential.auth-credential': ApiAuthCredentialAuthCredential;
       'plugin::content-releases.release': PluginContentReleasesRelease;
