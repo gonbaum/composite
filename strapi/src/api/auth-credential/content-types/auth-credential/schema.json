@@ -1,0 +1,41 @@
+{
+  "kind": "collectionType",
+  "collectionName": "auth_credentials",
+  "info": {
+    "singularName": "auth-credential",
+    "pluralName": "auth-credentials",
+    "displayName": "Auth Credential",
+    "description": "Authentication credentials for API actions"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "display_name": {
+      "type": "string",
+      "required": true
+    },
+    "auth_type": {
+      "type": "enumeration",
+      "enum": ["bearer", "custom_headers"],
+      "required": true
+    },
+    "bearer_token": {
+      "type": "text",
+      "private": true
+    },
+    "custom_headers": {
+      "type": "json",
+      "private": true
+    },
+    "description": {
+      "type": "text"
+    }
+  }
+}

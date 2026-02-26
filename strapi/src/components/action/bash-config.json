@@ -1,0 +1,24 @@
+{
+  "collectionName": "components_action_bash_configs",
+  "info": {
+    "displayName": "Bash Config",
+    "description": "Configuration for bash-type actions"
+  },
+  "options": {},
+  "attributes": {
+    "command_template": {
+      "type": "text",
+      "required": true
+    },
+    "timeout_ms": {
+      "type": "integer",
+      "default": 30000
+    },
+    "working_directory": {
+      "type": "string"
+    },
+    "allowed_commands": {
+      "type": "json"
+    }
+  }
+}

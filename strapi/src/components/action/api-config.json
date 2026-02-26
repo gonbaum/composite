@@ -1,0 +1,30 @@
+{
+  "collectionName": "components_action_api_configs",
+  "info": {
+    "displayName": "API Config",
+    "description": "Configuration for API-type actions"
+  },
+  "options": {},
+  "attributes": {
+    "method": {
+      "type": "enumeration",
+      "enum": ["GET", "POST", "PUT", "PATCH", "DELETE"],
+      "default": "GET",
+      "required": true
+    },
+    "url_template": {
+      "type": "string",
+      "required": true
+    },
+    "headers": {
+      "type": "json"
+    },
+    "body_template": {
+      "type": "text"
+    },
+    "timeout_ms": {
+      "type": "integer",
+      "default": 30000
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "collectionName": "components_action_parameters",
+  "info": {
+    "displayName": "Parameter",
+    "description": "A parameter definition for an action"
+  },
+  "options": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "type": {
+      "type": "enumeration",
+      "enum": ["string", "number", "boolean"],
+      "default": "string",
+      "required": true
+    },
+    "description": {
+      "type": "string",
+      "required": true
+    },
+    "required": {
+      "type": "boolean",
+      "default": true
+    },
+    "default_value": {
+      "type": "string"
+    }
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "kind": "collectionType",
+  "collectionName": "actions",
+  "info": {
+    "singularName": "action",
+    "pluralName": "actions",
+    "displayName": "Action",
+    "description": "A tool action that can be executed via MCP"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "display_name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "text",
+      "required": true
+    },
+    "action_type": {
+      "type": "enumeration",
+      "enum": ["api", "bash", "composite"],
+      "default": "api",
+      "required": true
+    },
+    "tags": {
+      "type": "json"
+    },
+    "parameters": {
+      "type": "component",
+      "repeatable": true,
+      "component": "action.parameter"
+    },
+    "api_config": {
+      "type": "component",
+      "repeatable": false,
+      "component": "action.api-config"
+    },
+    "bash_config": {
+      "type": "component",
+      "repeatable": false,
+      "component": "action.bash-config"
+    },
+    "composite_config": {
+      "type": "component",
+      "repeatable": false,
+      "component": "action.composite-config"
+    },
+    "auth_credential": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::auth-credential.auth-credential"
+    },
+    "enabled": {
+      "type": "boolean",
+      "default": true
+    }
+  }
+}

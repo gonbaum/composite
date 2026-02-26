@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "strapi-actions": {
+      "command": "node",
+      "args": ["strapi-mcp-server/src/index.js"],
+      "cwd": "/Users/gonzalogarcia/Dev/strapi-as-mcp",
+      "env": {
+        "STRAPI_URL": "http://localhost:1337"
+      }
+    }
+  }
+}
