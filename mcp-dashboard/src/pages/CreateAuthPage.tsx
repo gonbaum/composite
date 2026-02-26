@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { Settings2, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import FormField from "@/components/FormField";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -76,84 +78,104 @@ export default function CreateAuthPage() {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-6">
-        {isEdit ? "Edit Credential" : "Create Credential"}
-      </h2>
-      <form onSubmit={handleSubmit} className="space-y-4 max-w-lg">
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold">
+          {isEdit ? "Edit Credential" : "Create Credential"}
+        </h2>
+        <p className="text-sm text-muted-foreground">
+          Store authentication details for API actions.
+        </p>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-6 max-w-lg">
         {error && (
           <p className="text-sm text-destructive bg-destructive/10 p-3 rounded">{error}</p>
         )}
 
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-1">
-            <Label>Name (slug)</Label>
-            <Input
-              value={form.name}
-              onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-              placeholder="my_api_key"
-              required
-            />
-          </div>
-          <div className="space-y-1">
-            <Label>Display Name</Label>
-            <Input
-              value={form.display_name}
-              onChange={(e) => setForm((f) => ({ ...f, display_name: e.target.value }))}
-              placeholder="My API Key"
-              required
-            />
-          </div>
-        </div>
+        <Card>
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Settings2 className="h-4 w-4 text-muted-foreground" />
+              General
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <FormField label="Name (slug)">
+                <Input
+                  value={form.name}
+                  onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                  placeholder="my_api_key"
+                  required
+                />
+              </FormField>
+              <FormField label="Display Name">
+                <Input
+                  value={form.display_name}
+                  onChange={(e) => setForm((f) => ({ ...f, display_name: e.target.value }))}
+                  placeholder="My API Key"
+                  required
+                />
+              </FormField>
+            </div>
 
-        <div className="space-y-1">
-          <Label>Auth Type</Label>
-          <Select
-            value={form.auth_type}
-            onValueChange={(v) =>
-              setForm((f) => ({ ...f, auth_type: v as "bearer" | "custom_headers" }))
-            }
-          >
-            <SelectTrigger><SelectValue /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="bearer">Bearer Token</SelectItem>
-              <SelectItem value="custom_headers">Custom Headers</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+            <FormField label="Description">
+              <Textarea
+                value={form.description}
+                onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+                placeholder="What is this credential for?"
+                rows={2}
+              />
+            </FormField>
+          </CardContent>
+        </Card>
 
-        {form.auth_type === "bearer" && (
-          <div className="space-y-1">
-            <Label>Bearer Token</Label>
-            <Input
-              type="password"
-              value={form.bearer_token}
-              onChange={(e) => setForm((f) => ({ ...f, bearer_token: e.target.value }))}
-              placeholder="sk-..."
-            />
-          </div>
-        )}
+        <Card>
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Shield className="h-4 w-4 text-muted-foreground" />
+              Authentication
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <FormField label="Auth Type">
+              <Select
+                value={form.auth_type}
+                onValueChange={(v) =>
+                  setForm((f) => ({ ...f, auth_type: v as "bearer" | "custom_headers" }))
+                }
+              >
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="bearer">Bearer Token</SelectItem>
+                  <SelectItem value="custom_headers">Custom Headers</SelectItem>
+                </SelectContent>
+              </Select>
+            </FormField>
 
-        {form.auth_type === "custom_headers" && (
-          <div className="space-y-1">
-            <Label>Custom Headers</Label>
-            <KeyValueEditor
-              value={form.custom_headers}
-              onChange={(v) => setForm((f) => ({ ...f, custom_headers: v }))}
-              keyPlaceholder="Header name"
-              valuePlaceholder="Header value"
-            />
-          </div>
-        )}
+            {form.auth_type === "bearer" && (
+              <FormField label="Bearer Token">
+                <Input
+                  type="password"
+                  value={form.bearer_token}
+                  onChange={(e) => setForm((f) => ({ ...f, bearer_token: e.target.value }))}
+                  placeholder="sk-..."
+                />
+              </FormField>
+            )}
 
-        <div className="space-y-1">
-          <Label>Description</Label>
-          <Textarea
-            value={form.description}
-            onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-            placeholder="What is this credential for?"
-            rows={2}
-          />
-        </div>
+            {form.auth_type === "custom_headers" && (
+              <FormField label="Custom Headers">
+                <KeyValueEditor
+                  value={form.custom_headers}
+                  onChange={(v) => setForm((f) => ({ ...f, custom_headers: v }))}
+                  keyPlaceholder="Header name"
+                  valuePlaceholder="Header value"
+                />
+              </FormField>
+            )}
+          </CardContent>
+        </Card>
 
         <div className="flex gap-3">
           <Button type="submit" disabled={saving}>

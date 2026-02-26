@@ -1,5 +1,4 @@
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
@@ -8,6 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import FormField from "@/components/FormField";
 import KeyValueEditor from "@/components/KeyValueEditor";
 import type { ApiConfig, AuthCredential } from "@/types";
 
@@ -31,8 +31,7 @@ export default function ApiConfigFields({
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-1">
-          <Label>Method</Label>
+        <FormField label="Method">
           <Select
             value={value.method}
             onValueChange={(v) => update({ method: v as ApiConfig["method"] })}
@@ -44,39 +43,35 @@ export default function ApiConfigFields({
               ))}
             </SelectContent>
           </Select>
-        </div>
-        <div className="space-y-1">
-          <Label>Timeout (ms)</Label>
+        </FormField>
+        <FormField label="Timeout (ms)">
           <Input
             type="number"
             value={value.timeout_ms}
             onChange={(e) => update({ timeout_ms: parseInt(e.target.value) || 30000 })}
           />
-        </div>
+        </FormField>
       </div>
 
-      <div className="space-y-1">
-        <Label>URL Template</Label>
+      <FormField label="URL Template">
         <Input
           value={value.url_template}
           onChange={(e) => update({ url_template: e.target.value })}
           placeholder="https://api.example.com/{{param}}"
         />
-      </div>
+      </FormField>
 
-      <div className="space-y-1">
-        <Label>Headers</Label>
+      <FormField label="Headers">
         <KeyValueEditor
           value={value.headers || {}}
           onChange={(h) => update({ headers: h })}
           keyPlaceholder="Header name"
           valuePlaceholder="Header value"
         />
-      </div>
+      </FormField>
 
       {["POST", "PUT", "PATCH"].includes(value.method) && (
-        <div className="space-y-1">
-          <Label>Body Template</Label>
+        <FormField label="Body Template">
           <Textarea
             value={value.body_template || ""}
             onChange={(e) => update({ body_template: e.target.value || null })}
@@ -84,11 +79,10 @@ export default function ApiConfigFields({
             rows={4}
             className="font-mono text-sm"
           />
-        </div>
+        </FormField>
       )}
 
-      <div className="space-y-1">
-        <Label>Auth Credential</Label>
+      <FormField label="Auth Credential">
         <Select
           value={selectedCredential || "none"}
           onValueChange={(v) => onCredentialChange(v === "none" ? null : v)}
@@ -103,7 +97,7 @@ export default function ApiConfigFields({
             ))}
           </SelectContent>
         </Select>
-      </div>
+      </FormField>
     </div>
   );
 }

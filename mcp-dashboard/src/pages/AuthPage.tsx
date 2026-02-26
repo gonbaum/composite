@@ -33,7 +33,12 @@ export default function AuthPage() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Auth Credentials</h2>
+        <div>
+          <h2 className="text-2xl font-bold">Auth Credentials</h2>
+          <p className="text-sm text-muted-foreground">
+            Manage API keys and tokens used by your actions.
+          </p>
+        </div>
         <Button onClick={() => navigate("/auth/new")}>
           <Plus className="mr-2 h-4 w-4" /> New Credential
         </Button>

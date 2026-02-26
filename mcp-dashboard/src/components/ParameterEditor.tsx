@@ -10,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import FormField from "@/components/FormField";
 import type { Parameter } from "@/types";
 
 interface Props {
@@ -36,16 +37,14 @@ export default function ParameterEditor({ value, onChange }: Props) {
       {value.map((p, i) => (
         <div key={i} className="border rounded-md p-3 space-y-2">
           <div className="flex gap-2">
-            <div className="flex-1 space-y-1">
-              <Label className="text-xs">Name</Label>
+            <FormField label="Name" className="flex-1">
               <Input
                 value={p.name}
                 onChange={(e) => update(i, { name: e.target.value })}
                 placeholder="param_name"
               />
-            </div>
-            <div className="w-28 space-y-1">
-              <Label className="text-xs">Type</Label>
+            </FormField>
+            <FormField label="Type" className="w-28">
               <Select
                 value={p.type}
                 onValueChange={(v) => update(i, { type: v as Parameter["type"] })}
@@ -57,7 +56,7 @@ export default function ParameterEditor({ value, onChange }: Props) {
                   <SelectItem value="boolean">boolean</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
+            </FormField>
             <Button
               type="button"
               variant="ghost"
@@ -68,30 +67,28 @@ export default function ParameterEditor({ value, onChange }: Props) {
               <X className="h-4 w-4" />
             </Button>
           </div>
-          <div className="space-y-1">
-            <Label className="text-xs">Description</Label>
+          <FormField label="Description">
             <Input
               value={p.description}
               onChange={(e) => update(i, { description: e.target.value })}
               placeholder="What this parameter does"
             />
-          </div>
+          </FormField>
           <div className="flex gap-4 items-center">
             <div className="flex items-center gap-2">
               <Switch
                 checked={p.required}
                 onCheckedChange={(v) => update(i, { required: v })}
               />
-              <Label className="text-xs">Required</Label>
+              <Label className="text-xs font-medium text-muted-foreground">Required</Label>
             </div>
-            <div className="flex-1 space-y-1">
-              <Label className="text-xs">Default value</Label>
+            <FormField label="Default value" className="flex-1">
               <Input
                 value={p.default_value || ""}
                 onChange={(e) => update(i, { default_value: e.target.value || null })}
                 placeholder="Optional default"
               />
-            </div>
+            </FormField>
           </div>
         </div>
       ))}

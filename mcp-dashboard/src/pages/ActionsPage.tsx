@@ -1,15 +1,18 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, Search } from "lucide-react";
+import { Plus, Search, Globe, Terminal, Layers } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import ActionTable from "@/components/ActionTable";
 import TestModal from "@/components/TestModal";
 import { getActions, updateAction, deleteAction } from "@/lib/strapi";
 import type { Action, ActionType } from "@/types";
 
-const typeFilters: ActionType[] = ["api", "bash", "composite"];
+const typeFilters: { value: ActionType; label: string; icon: typeof Globe; className: string }[] = [
+  { value: "api", label: "API", icon: Globe, className: "bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-950 dark:text-blue-400 dark:border-blue-900" },
+  { value: "bash", label: "Bash", icon: Terminal, className: "bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-950 dark:text-amber-400 dark:border-amber-900" },
+  { value: "composite", label: "Composite", icon: Layers, className: "bg-violet-100 text-violet-700 border-violet-200 dark:bg-violet-950 dark:text-violet-400 dark:border-violet-900" },
+];
 
 export default function ActionsPage() {
   const navigate = useNavigate();
@@ -58,9 +61,14 @@ export default function ActionsPage() {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Actions</h2>
+        <div>
+          <h2 className="text-2xl font-bold">Actions</h2>
+          <p className="text-sm text-muted-foreground">
+            Manage the tools available to your MCP server.
+          </p>
+        </div>
         <Button onClick={() => navigate("/actions/new")}>
           <Plus className="mr-2 h-4 w-4" /> New Action
         </Button>
@@ -77,23 +85,32 @@ export default function ActionsPage() {
           />
         </div>
         <div className="flex gap-1">
-          <Badge
-            variant={typeFilter === null ? "default" : "outline"}
-            className="cursor-pointer"
+          <button
             onClick={() => setTypeFilter(null)}
+            className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium border transition-colors ${
+              typeFilter === null
+                ? "bg-foreground text-background border-foreground"
+                : "bg-transparent text-muted-foreground border-border hover:border-foreground/30"
+            }`}
           >
             All
-          </Badge>
-          {typeFilters.map((t) => (
-            <Badge
-              key={t}
-              variant={typeFilter === t ? "default" : "outline"}
-              className="cursor-pointer"
-              onClick={() => setTypeFilter(typeFilter === t ? null : t)}
-            >
-              {t}
-            </Badge>
-          ))}
+          </button>
+          {typeFilters.map((t) => {
+            const Icon = t.icon;
+            const active = typeFilter === t.value;
+            return (
+              <button
+                key={t.value}
+                onClick={() => setTypeFilter(active ? null : t.value)}
+                className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium border transition-colors ${
+                  active ? t.className : "bg-transparent text-muted-foreground border-border hover:border-foreground/30"
+                }`}
+              >
+                <Icon className="h-3 w-3" />
+                {t.label}
+              </button>
+            );
+          })}
         </div>
       </div>
 
