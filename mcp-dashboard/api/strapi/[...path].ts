@@ -80,7 +80,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const upstream = await fetch(targetUrl, fetchOptions);
-  const data = await upstream.json();
 
+  const contentType = upstream.headers.get("content-type") ?? "";
+  if (!contentType.includes("application/json")) {
+    const text = await upstream.text();
+    console.error(`Strapi non-JSON response (${upstream.status}) from ${targetUrl}:`, text.slice(0, 200));
+    return res.status(upstream.status).json({ error: `Upstream error ${upstream.status}`, detail: text.slice(0, 200) });
+  }
+
+  const data = await upstream.json();
   return res.status(upstream.status).json(data);
 }
