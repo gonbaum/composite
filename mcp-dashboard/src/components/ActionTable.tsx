@@ -96,8 +96,15 @@ export default function ActionTable({ actions, onToggle, onDelete, onTest }: Pro
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => onTest(action)}>
+                    <DropdownMenuItem
+                      disabled={action.action_type === "bash"}
+                      onClick={() => onTest(action)}
+                      title={action.action_type === "bash" ? "Bash actions can only be tested via MCP" : undefined}
+                    >
                       <Play className="mr-2 h-4 w-4" /> Test
+                      {action.action_type === "bash" && (
+                        <span className="ml-auto text-xs text-muted-foreground">MCP only</span>
+                      )}
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => navigate(`/actions/${action.documentId}/edit`)}>
                       <Pencil className="mr-2 h-4 w-4" /> Edit

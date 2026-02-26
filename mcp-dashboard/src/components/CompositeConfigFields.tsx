@@ -152,15 +152,22 @@ export default function CompositeConfigFields({
               <Label className="text-sm font-medium">Step {i + 1}</Label>
               <div className="flex items-center gap-1">
                 {selected && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    title="Test this step"
-                    onClick={() => setTestAction(selected)}
-                  >
-                    <Play className="h-4 w-4" />
-                  </Button>
+                  selected.action_type === "bash" ? (
+                    <span className="text-xs text-muted-foreground px-2" title="Bash actions run locally and can only be tested via MCP">
+                      MCP only
+                    </span>
+                  ) : (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="h-7 text-xs"
+                      onClick={() => setTestAction(selected)}
+                    >
+                      <Play className="mr-1 h-3 w-3" />
+                      Test
+                    </Button>
+                  )
                 )}
                 <Button
                   type="button"
