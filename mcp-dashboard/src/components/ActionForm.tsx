@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Globe, Terminal, Layers, Settings2, List, Eye } from "lucide-react";
+import { Globe, Terminal, Layers, Settings2, List, Eye, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,7 +20,7 @@ import ParameterEditor from "@/components/ParameterEditor";
 import ApiConfigFields from "@/components/ApiConfigFields";
 import BashConfigFields from "@/components/BashConfigFields";
 import CompositeConfigFields from "@/components/CompositeConfigFields";
-import { getAuthCredentials, getActions } from "@/lib/strapi";
+import { getAuthCredentials, getActions, executeAction } from "@/lib/strapi";
 import type { Action, ActionFormData, ActionType, ApiConfig, BashConfig, CompositeConfig, AuthCredential } from "@/types";
 
 const defaultApiConfig: ApiConfig = {
@@ -85,21 +85,27 @@ export default function ActionForm({ initial, onSubmit, submitLabel = "Create" }
   const [availableActions, setAvailableActions] = useState<Action[]>([]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [testParams, setTestParams] = useState<Record<string, string>>({});
+  const [testResult, setTestResult] = useState<unknown>(null);
+  const [testError, setTestError] = useState<string | null>(null);
+  const [testing, setTesting] = useState(false);
 
-  const [form, setForm] = useState<ActionFormData>(
-    initial || {
-      name: "",
-      display_name: "",
-      description: "",
-      action_type: "api",
-      tags: [],
-      parameters: [],
-      api_config: { ...defaultApiConfig },
-      bash_config: null,
-      composite_config: null,
-      auth_credential: null,
-      enabled: true,
-    }
+  const [form, setForm] = useState<ActionFormData>(() =>
+    initial
+      ? JSON.parse(JSON.stringify(initial))
+      : {
+          name: "",
+          display_name: "",
+          description: "",
+          action_type: "api",
+          tags: [],
+          parameters: [],
+          api_config: { ...defaultApiConfig },
+          bash_config: null,
+          composite_config: null,
+          auth_credential: null,
+          enabled: true,
+        }
   );
 
   useEffect(() => {
@@ -108,7 +114,7 @@ export default function ActionForm({ initial, onSubmit, submitLabel = "Create" }
   }, []);
 
   useEffect(() => {
-    if (initial) setForm(initial);
+    if (initial) setForm(JSON.parse(JSON.stringify(initial)));
   }, [initial]);
 
   const updateType = (t: ActionType) => {
@@ -128,11 +134,25 @@ export default function ActionForm({ initial, onSubmit, submitLabel = "Create" }
     setError(null);
     try {
       await onSubmit(form);
-      navigate("/");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Save failed");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleTest = async () => {
+    if (!form.name) return;
+    setTesting(true);
+    setTestError(null);
+    setTestResult(null);
+    try {
+      const res = await executeAction(form.name, testParams);
+      setTestResult(res);
+    } catch (err) {
+      setTestError(err instanceof Error ? err.message : "Test failed");
+    } finally {
+      setTesting(false);
     }
   };
 
@@ -290,9 +310,9 @@ export default function ActionForm({ initial, onSubmit, submitLabel = "Create" }
         </div>
       </form>
 
-      {/* Right: MCP Preview */}
-      <div className="w-1/2 shrink-0">
-        <div className="sticky top-6">
+      {/* Right: MCP Preview + Test */}
+      <div className="w-1/2 shrink-0 space-y-6">
+        <div className="sticky top-6 space-y-6">
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
@@ -304,9 +324,66 @@ export default function ActionForm({ initial, onSubmit, submitLabel = "Create" }
               </p>
             </CardHeader>
             <CardContent>
-              <pre className="text-xs text-muted-foreground bg-muted p-3 rounded overflow-auto max-h-[calc(100vh-12rem)]">
+              <pre className="text-xs text-muted-foreground bg-muted p-3 rounded overflow-auto max-h-60">
                 {JSON.stringify(mcpPreview, null, 2)}
               </pre>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-sm text-emerald-600 dark:text-emerald-400">
+                <Play className="h-4 w-4" />
+                Test Action
+              </CardTitle>
+              <p className="text-xs text-muted-foreground">
+                Runs the saved version — save first to test changes
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {form.parameters.length > 0 && (
+                <div className="space-y-2">
+                  {form.parameters.map((p) => (
+                    <div key={p.name || p.id} className="space-y-1">
+                      <Label className="text-xs text-muted-foreground">
+                        {p.name || "param"}
+                        {p.required && <span className="text-destructive ml-1">*</span>}
+                      </Label>
+                      <Input
+                        placeholder={p.description || p.name}
+                        value={testParams[p.name] || ""}
+                        onChange={(e) =>
+                          setTestParams((prev) => ({ ...prev, [p.name]: e.target.value }))
+                        }
+                        className="h-8 text-sm"
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <Button
+                type="button"
+                size="sm"
+                onClick={handleTest}
+                disabled={testing || !form.name}
+                className="bg-emerald-600 hover:bg-emerald-700 text-white"
+              >
+                <Play className="mr-2 h-3 w-3" />
+                {testing ? "Running..." : "Run"}
+              </Button>
+
+              {testError && (
+                <pre className="bg-destructive/10 text-destructive p-3 rounded text-xs overflow-auto max-h-48">
+                  {testError}
+                </pre>
+              )}
+
+              {testResult !== null && (
+                <pre className="text-xs text-muted-foreground bg-muted p-3 rounded overflow-auto max-h-48">
+                  {JSON.stringify(testResult, null, 2)}
+                </pre>
+              )}
             </CardContent>
           </Card>
         </div>

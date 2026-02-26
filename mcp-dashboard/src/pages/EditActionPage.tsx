@@ -14,7 +14,7 @@ export default function EditActionPage() {
     if (!documentId) return;
     getAction(documentId)
       .then((a) => {
-        setInitial({
+        setInitial(JSON.parse(JSON.stringify({
           name: a.name,
           display_name: a.display_name || "",
           description: a.description,
@@ -26,7 +26,7 @@ export default function EditActionPage() {
           composite_config: a.composite_config,
           auth_credential: a.auth_credential?.documentId || null,
           enabled: a.enabled,
-        });
+        })));
       })
       .finally(() => setLoading(false));
   }, [documentId]);

@@ -23,12 +23,15 @@ export default function TagInput({ value, onChange }: Props) {
     <div className="space-y-2">
       <div className="flex gap-1 flex-wrap">
         {value.map((tag) => (
-          <Badge key={tag} variant="secondary" className="gap-1">
+          <Badge key={tag} variant="secondary" className="gap-1 pr-1">
             {tag}
-            <X
-              className="h-3 w-3 cursor-pointer"
+            <button
+              type="button"
+              className="ml-0.5 rounded-full p-0.5 hover:bg-foreground/10"
               onClick={() => onChange(value.filter((t) => t !== tag))}
-            />
+            >
+              <X className="h-3 w-3" />
+            </button>
           </Badge>
         ))}
       </div>
