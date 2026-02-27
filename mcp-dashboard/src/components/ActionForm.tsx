@@ -84,6 +84,7 @@ export default function ActionForm({ initial, onSubmit, submitLabel = "Create" }
   const [credentials, setCredentials] = useState<AuthCredential[]>([]);
   const [availableActions, setAvailableActions] = useState<Action[]>([]);
   const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [testParams, setTestParams] = useState<Record<string, string>>({});
   const [testResult, setTestResult] = useState<unknown>(null);
@@ -131,9 +132,12 @@ export default function ActionForm({ initial, onSubmit, submitLabel = "Create" }
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
+    setSaved(false);
     setError(null);
     try {
       await onSubmit(form);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Save failed");
     } finally {
@@ -302,7 +306,7 @@ export default function ActionForm({ initial, onSubmit, submitLabel = "Create" }
 
         <div className="flex gap-3">
           <Button type="submit" disabled={saving}>
-            {saving ? "Saving..." : submitLabel}
+            {saving ? "Saving..." : saved ? "Saved!" : submitLabel}
           </Button>
           <Button type="button" variant="outline" onClick={() => navigate("/")}>
             Cancel
