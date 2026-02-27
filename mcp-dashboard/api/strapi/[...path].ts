@@ -48,22 +48,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(401).json({ error: "Unauthorized" });
   }
 
-  // Build the target URL
-  const pathSegments = req.query["...path"];
-  const path = Array.isArray(pathSegments) ? pathSegments.join("/") : pathSegments || "";
-
-  // Rebuild query string excluding the catch-all "path" param
-  const params = new URLSearchParams();
-  for (const [key, value] of Object.entries(req.query)) {
-    if (key === "...path") continue;
-    if (Array.isArray(value)) {
-      value.forEach((v) => params.append(key, v));
-    } else if (value !== undefined) {
-      params.append(key, value);
-    }
-  }
-  const qs = params.toString();
-  const targetUrl = `${strapiUrl}/api/${path}${qs ? `?${qs}` : ""}`;
+  // Extract path and query string from the raw URL to preserve bracket notation
+  const url = new URL(req.url || "/", `http://${req.headers.host}`);
+  const path = url.pathname.replace(/^\/api\/strapi\/?/, "");
+  const qs = url.search;
+  const targetUrl = `${strapiUrl}/api/${path}${qs}`;
 
   const headers: Record<string, string> = {
     Authorization: `Bearer ${strapiToken}`,
