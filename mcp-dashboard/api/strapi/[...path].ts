@@ -52,8 +52,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // req.url looks like: /api/strapi/actions?populate%5Bparameters%5D=true&...
   const [rawPath, rawQs = ""] = (req.url || "/").split("?");
   const path = rawPath.replace(/^\/api\/strapi\/?/, "");
-  // Decode the query string so Strapi gets populate[parameters] not populate%5Bparameters%5D
-  const cleanQs = decodeURIComponent(rawQs);
+  // Decode brackets and strip Vercel's injected ...path param
+  const cleanQs = decodeURIComponent(rawQs)
+    .split("&")
+    .filter((p) => !p.startsWith("...path="))
+    .join("&");
   const targetUrl = `${strapiUrl}/api/${path}${cleanQs ? `?${cleanQs}` : ""}`;
 
   console.log(JSON.stringify({
