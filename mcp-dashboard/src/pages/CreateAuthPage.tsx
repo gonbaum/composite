@@ -88,7 +88,7 @@ export default function CreateAuthPage() {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6 max-w-lg">
+      <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl">
         {error && (
           <p className="text-sm text-destructive bg-destructive/10 p-3 rounded">{error}</p>
         )}

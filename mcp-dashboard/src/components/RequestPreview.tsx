@@ -33,7 +33,7 @@ function resolveApiRequest(
   if (!config) return null;
 
   const url = resolveTemplate(config.url_template || "", testParams);
-  const body = config.body_template ? resolveTemplate(config.body_template, testParams) : null;
+  const body = resolveTemplate(config.body_template || "", testParams) || null;
   const headers: Record<string, string> = {};
 
   if (config.headers && typeof config.headers === "object") {
