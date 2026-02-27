@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Globe, Terminal, Layers, Settings2, List, Eye, Play, Send } from "lucide-react";
+import { Globe, Terminal, Layers, Settings2, List, Eye, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -150,7 +150,8 @@ export default function ActionForm({ initial, onSubmit, submitLabel = "Create" }
     setTestError(null);
     setTestResult(null);
     try {
-      const res = await executeAction(form.name, testParams);
+      const raw = await executeAction(form.name, testParams) as Record<string, unknown>;
+      const { resolved_request: _, ...res } = raw;
       setTestResult(res);
     } catch (err) {
       setTestError(err instanceof Error ? err.message : "Test failed");
@@ -377,13 +378,13 @@ export default function ActionForm({ initial, onSubmit, submitLabel = "Create" }
               </Button>
 
               {testError && (
-                <pre className="bg-destructive/10 text-destructive p-3 rounded text-xs overflow-auto max-h-48">
+                <pre className="bg-destructive/10 text-destructive p-3 rounded text-xs overflow-auto max-h-[32rem]">
                   {testError}
                 </pre>
               )}
 
               {testResult !== null && (
-                <pre className="text-xs text-muted-foreground bg-muted p-3 rounded overflow-auto max-h-48">
+                <pre className="text-xs text-muted-foreground bg-muted p-3 rounded overflow-auto max-h-[32rem]">
                   {JSON.stringify(testResult, null, 2)}
                 </pre>
               )}

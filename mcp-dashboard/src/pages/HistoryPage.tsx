@@ -64,7 +64,7 @@ function ResolvedRequestPanel({ log }: { log: ActionLog }) {
             <span className="text-muted-foreground break-all">{String(req.url)}</span>
           </code>
         </div>
-        {req.headers && typeof req.headers === "object" && Object.keys(req.headers).length > 0 && (
+        {req.headers && typeof req.headers === "object" && Object.keys(req.headers as Record<string, string>).length > 0 ? (
           <div>
             <p className="text-[10px] font-semibold uppercase text-muted-foreground mb-1">Headers</p>
             <pre className="text-xs text-muted-foreground bg-muted p-2 rounded overflow-auto max-h-32">
@@ -73,15 +73,15 @@ function ResolvedRequestPanel({ log }: { log: ActionLog }) {
                 .join("\n")}
             </pre>
           </div>
-        )}
-        {req.body && (
+        ) : null}
+        {req.body ? (
           <div>
             <p className="text-[10px] font-semibold uppercase text-muted-foreground mb-1">Body</p>
             <pre className="text-xs text-muted-foreground bg-muted p-2 rounded overflow-auto max-h-32">
               {String(req.body)}
             </pre>
           </div>
-        )}
+        ) : null}
       </div>
     );
   }
