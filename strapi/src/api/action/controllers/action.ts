@@ -110,7 +110,9 @@ async function handleApiExecution(actionDef: any, resolvedParams: Record<string,
       return { action_type: "api", success: false, status: response.status, error: data, resolved_request };
     }
   } catch (error: any) {
-    return { action_type: "api", success: false, error: error.message, resolved_request };
+    const cause = error.cause ? (error.cause.message || String(error.cause)) : null;
+    const message = cause ? `${error.message}: ${cause}` : error.message;
+    return { action_type: "api", success: false, error: message, resolved_request };
   }
 }
 
