@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { Globe, Terminal, Layers, Settings2, List, Eye, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -80,7 +79,6 @@ interface Props {
 }
 
 export default function ActionForm({ initial, onSubmit, submitLabel = "Create" }: Props) {
-  const navigate = useNavigate();
   const [credentials, setCredentials] = useState<AuthCredential[]>([]);
   const [availableActions, setAvailableActions] = useState<Action[]>([]);
   const [saving, setSaving] = useState(false);
