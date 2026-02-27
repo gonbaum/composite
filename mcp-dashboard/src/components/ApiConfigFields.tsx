@@ -70,17 +70,15 @@ export default function ApiConfigFields({
         />
       </FormField>
 
-      {["POST", "PUT", "PATCH"].includes(value.method) && (
-        <FormField label="Body Template">
-          <Textarea
-            value={value.body_template || ""}
-            onChange={(e) => update({ body_template: e.target.value || null })}
-            placeholder='{"key": "{{param}}"}'
-            rows={4}
-            className="font-mono text-sm"
-          />
-        </FormField>
-      )}
+      <FormField label="Body Template">
+        <Textarea
+          value={value.body_template || ""}
+          onChange={(e) => update({ body_template: e.target.value || null })}
+          placeholder='{"key": "{{param}}"}'
+          rows={4}
+          className="font-mono text-sm"
+        />
+      </FormField>
 
       <FormField label="Auth Credential">
         <Select
