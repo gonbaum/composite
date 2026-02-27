@@ -53,14 +53,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const path = Array.isArray(pathSegments) ? pathSegments.join("/") : pathSegments || "";
 
   // Rebuild query string from raw URL, stripping only the "...path" param
-  // We use the raw URL to preserve bracket notation (e.g. populate[parameters]=true)
-  // which URLSearchParams would encode as populate%5Bparameters%5D
   const rawQs = (req.url || "").split("?")[1] || "";
   const cleanQs = rawQs
     .split("&")
     .filter((p) => !p.startsWith("...path=") && p !== "")
     .join("&");
   const targetUrl = `${strapiUrl}/api/${path}${cleanQs ? `?${cleanQs}` : ""}`;
+
+  console.log(JSON.stringify({
+    tag: "PROXY_DEBUG",
+    method: req.method,
+    reqUrl: req.url,
+    query: req.query,
+    path,
+    rawQs,
+    cleanQs,
+    targetUrl,
+  }));
 
   const headers: Record<string, string> = {
     Authorization: `Bearer ${strapiToken}`,
