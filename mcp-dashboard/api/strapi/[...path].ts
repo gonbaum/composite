@@ -48,25 +48,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(401).json({ error: "Unauthorized" });
   }
 
-  // Build path from Vercel's catch-all param
-  const pathSegments = req.query["...path"];
-  const path = Array.isArray(pathSegments) ? pathSegments.join("/") : pathSegments || "";
-
-  // Rebuild query string from raw URL, stripping only the "...path" param
-  const rawQs = (req.url || "").split("?")[1] || "";
-  const cleanQs = rawQs
-    .split("&")
-    .filter((p) => !p.startsWith("...path=") && p !== "")
-    .join("&");
+  // Extract path and query string from req.url
+  // req.url looks like: /api/strapi/actions?populate%5Bparameters%5D=true&...
+  const [rawPath, rawQs = ""] = (req.url || "/").split("?");
+  const path = rawPath.replace(/^\/api\/strapi\/?/, "");
+  // Decode the query string so Strapi gets populate[parameters] not populate%5Bparameters%5D
+  const cleanQs = decodeURIComponent(rawQs);
   const targetUrl = `${strapiUrl}/api/${path}${cleanQs ? `?${cleanQs}` : ""}`;
 
   console.log(JSON.stringify({
     tag: "PROXY_DEBUG",
     method: req.method,
     reqUrl: req.url,
-    query: req.query,
     path,
-    rawQs,
     cleanQs,
     targetUrl,
   }));

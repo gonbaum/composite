@@ -1,6 +1,5 @@
 {
   "rewrites": [
-    { "source": "/api/strapi/(.*)", "destination": "/api/strapi/[...path]" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }
