@@ -48,14 +48,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(401).json({ error: "Unauthorized" });
   }
 
-  // The rewrite sends the original URL path here, extract the Strapi path from it
-  const [rawPath, rawQs = ""] = (req.url || "/").split("?");
-  const path = rawPath.replace(/^\/api\/strapi\/?/, "").replace(/^\/api\/proxy\/?/, "");
-  // Decode brackets so Strapi gets populate[parameters] not populate%5Bparameters%5D
-  // Strip any Vercel-injected params like ...path or proxy
+  // Vercel rewrite passes :path* as query param "path"
+  // e.g. /api/strapi/actions/abc123?populate[x]=true -> /api/proxy?path=actions/abc123&populate[x]=true
+  const pathParam = req.query.path;
+  const path = Array.isArray(pathParam) ? pathParam.join("/") : pathParam || "";
+
+  // Build query string from raw URL, stripping the injected "path" param
+  // and decoding brackets so Strapi gets populate[parameters] not populate%5Bparameters%5D
+  const rawQs = (req.url || "").split("?")[1] || "";
   const cleanQs = decodeURIComponent(rawQs)
     .split("&")
-    .filter((p) => p !== "" && !p.startsWith("...path=") && !p.startsWith("proxy="))
+    .filter((p) => p !== "" && !p.startsWith("path="))
     .join("&");
   const targetUrl = `${strapiUrl}/api/${path}${cleanQs ? `?${cleanQs}` : ""}`;
 
