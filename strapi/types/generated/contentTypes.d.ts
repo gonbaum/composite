@@ -533,11 +533,11 @@ export interface ApiAuthCredentialAuthCredential
   attributes: {
     auth_type: Schema.Attribute.Enumeration<['bearer', 'custom_headers']> &
       Schema.Attribute.Required;
-    bearer_token: Schema.Attribute.Text & Schema.Attribute.Private;
+    bearer_token: Schema.Attribute.Text;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    custom_headers: Schema.Attribute.JSON & Schema.Attribute.Private;
+    custom_headers: Schema.Attribute.JSON;
     description: Schema.Attribute.Text;
     display_name: Schema.Attribute.String & Schema.Attribute.Required;
     locale: Schema.Attribute.String & Schema.Attribute.Private;

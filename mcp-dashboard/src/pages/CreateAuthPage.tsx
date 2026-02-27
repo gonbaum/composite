@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Settings2, Shield } from "lucide-react";
+import { Settings2, Shield, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -39,6 +39,7 @@ export default function CreateAuthPage() {
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(isEdit);
   const [error, setError] = useState<string | null>(null);
+  const [showToken, setShowToken] = useState(false);
 
   useEffect(() => {
     if (!documentId) return;
@@ -155,12 +156,22 @@ export default function CreateAuthPage() {
 
             {form.auth_type === "bearer" && (
               <FormField label="Bearer Token">
-                <Input
-                  type="password"
-                  value={form.bearer_token}
-                  onChange={(e) => setForm((f) => ({ ...f, bearer_token: e.target.value }))}
-                  placeholder="sk-..."
-                />
+                <div className="relative">
+                  <Input
+                    type={showToken ? "text" : "password"}
+                    value={form.bearer_token}
+                    onChange={(e) => setForm((f) => ({ ...f, bearer_token: e.target.value }))}
+                    placeholder="sk-..."
+                    className="pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowToken((v) => !v)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  >
+                    {showToken ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
               </FormField>
             )}
 

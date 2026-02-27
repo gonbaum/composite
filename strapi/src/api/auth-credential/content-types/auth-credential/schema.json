@@ -27,12 +27,10 @@
       "required": true
     },
     "bearer_token": {
-      "type": "text",
-      "private": true
+      "type": "text"
     },
     "custom_headers": {
-      "type": "json",
-      "private": true
+      "type": "json"
     },
     "description": {
       "type": "text"
