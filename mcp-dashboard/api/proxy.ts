@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { fromNodeHeaders } from "better-auth/node";
-import { auth } from "./lib/auth";
+import { auth } from "./lib/auth.js";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const strapiUrl = process.env.STRAPI_URL;
