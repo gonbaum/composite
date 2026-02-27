@@ -304,13 +304,11 @@ export default function ActionForm({ initial, onSubmit, submitLabel = "Create" }
           </CardContent>
         </Card>
 
-        <div className="flex gap-3">
+        <div className="flex items-center gap-3">
           <Button type="submit" disabled={saving}>
-            {saving ? "Saving..." : saved ? "Saved!" : submitLabel}
+            {saving ? "Saving..." : submitLabel}
           </Button>
-          <Button type="button" variant="outline" onClick={() => navigate("/")}>
-            Cancel
-          </Button>
+          {saved && <span className="text-sm text-emerald-600 dark:text-emerald-400">Saved successfully!</span>}
         </div>
       </form>
 
