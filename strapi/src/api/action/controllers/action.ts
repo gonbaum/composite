@@ -110,9 +110,14 @@ async function handleApiExecution(actionDef: any, resolvedParams: Record<string,
       return { action_type: "api", success: false, status: response.status, error: data, resolved_request };
     }
   } catch (error: any) {
-    const cause = error.cause ? (error.cause.message || String(error.cause)) : null;
-    const message = cause ? `${error.message}: ${cause}` : error.message;
-    return { action_type: "api", success: false, error: message, resolved_request };
+    const parts = [error.message];
+    let current = error.cause;
+    while (current) {
+      parts.push(current.message || String(current));
+      current = current.cause;
+    }
+    if (error.code) parts.push(`[${error.code}]`);
+    return { action_type: "api", success: false, error: parts.join(": "), resolved_request };
   }
 }
 
