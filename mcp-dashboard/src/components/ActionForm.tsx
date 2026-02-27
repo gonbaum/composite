@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Globe, Terminal, Layers, Settings2, List, Eye, Play } from "lucide-react";
+import { Globe, Terminal, Layers, Settings2, List, Eye, Play, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,6 +19,7 @@ import ParameterEditor from "@/components/ParameterEditor";
 import ApiConfigFields from "@/components/ApiConfigFields";
 import BashConfigFields from "@/components/BashConfigFields";
 import CompositeConfigFields from "@/components/CompositeConfigFields";
+import RequestPreview from "@/components/RequestPreview";
 import { getAuthCredentials, getActions, executeAction } from "@/lib/strapi";
 import type { Action, ActionFormData, ActionType, ApiConfig, BashConfig, CompositeConfig, AuthCredential } from "@/types";
 
@@ -329,6 +330,8 @@ export default function ActionForm({ initial, onSubmit, submitLabel = "Create" }
               </pre>
             </CardContent>
           </Card>
+
+          <RequestPreview form={form} testParams={testParams} credentials={credentials} />
 
           <Card>
             <CardHeader className="pb-3">

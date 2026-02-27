@@ -16,6 +16,15 @@ function resolveTemplate(template: string | null, params: Record<string, any>): 
   });
 }
 
+function redactHeaders(headers: Record<string, string>): Record<string, string> {
+  const sensitive = ["authorization", "x-api-key", "api-key", "token"];
+  const redacted: Record<string, string> = {};
+  for (const [key, value] of Object.entries(headers)) {
+    redacted[key] = sensitive.includes(key.toLowerCase()) ? "****" : value;
+  }
+  return redacted;
+}
+
 async function handleApiExecution(actionDef: any, resolvedParams: Record<string, any>) {
   const config = actionDef.api_config;
   if (!config) {
@@ -50,6 +59,13 @@ async function handleApiExecution(actionDef: any, resolvedParams: Record<string,
     headers["Content-Type"] = "application/json";
   }
 
+  const resolved_request = {
+    method: config.method,
+    url,
+    headers: redactHeaders(headers),
+    body: body || null,
+  };
+
   try {
     const fetchOptions: Record<string, any> = {
       method: config.method,
@@ -75,6 +91,7 @@ async function handleApiExecution(actionDef: any, resolvedParams: Record<string,
         success: true,
         status: response.status,
         image: { data: base64, mimeType: contentType.split(";")[0] },
+        resolved_request,
       };
     }
 
@@ -88,12 +105,12 @@ async function handleApiExecution(actionDef: any, resolvedParams: Record<string,
     }
 
     if (response.ok) {
-      return { action_type: "api", success: true, status: response.status, data };
+      return { action_type: "api", success: true, status: response.status, data, resolved_request };
     } else {
-      return { action_type: "api", success: false, status: response.status, error: data };
+      return { action_type: "api", success: false, status: response.status, error: data, resolved_request };
     }
   } catch (error: any) {
-    return { action_type: "api", success: false, error: error.message };
+    return { action_type: "api", success: false, error: error.message, resolved_request };
   }
 }
 
@@ -105,14 +122,17 @@ function handleBashResolution(actionDef: any, resolvedParams: Record<string, any
 
   const command = resolveTemplate(config.command_template, resolvedParams);
 
+  const resolved = {
+    command,
+    timeout_ms: config.timeout_ms || 30000,
+    working_directory: config.working_directory || null,
+    allowed_commands: config.allowed_commands || [],
+  };
+
   return {
     action_type: "bash",
-    resolved: {
-      command,
-      timeout_ms: config.timeout_ms || 30000,
-      working_directory: config.working_directory || null,
-      allowed_commands: config.allowed_commands || [],
-    },
+    resolved,
+    resolved_request: { command },
   };
 }
 
@@ -134,12 +154,15 @@ function handleCompositeResolution(actionDef: any, resolvedParams: Record<string
     return { ...step, params: stepParams };
   });
 
+  const resolved = {
+    steps: resolvedSteps,
+    stop_on_error: config.stop_on_error !== false,
+  };
+
   return {
     action_type: "composite",
-    resolved: {
-      steps: resolvedSteps,
-      stop_on_error: config.stop_on_error !== false,
-    },
+    resolved,
+    resolved_request: { steps: resolvedSteps },
   };
 }
 
@@ -214,6 +237,7 @@ export default factories.createCoreController("api::action.action", ({ strapi })
         duration_ms,
         status_code: result.status || null,
         source: source || "unknown",
+        resolved_request: result.resolved_request || null,
       },
     }).catch(() => {});
 

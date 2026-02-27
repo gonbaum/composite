@@ -102,6 +102,7 @@ export interface ActionLog {
   duration_ms: number | null;
   status_code: number | null;
   source: "dashboard" | "mcp" | "unknown";
+  resolved_request: Record<string, unknown> | null;
   createdAt: string;
 }
 

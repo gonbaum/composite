@@ -457,6 +457,7 @@ export interface ApiActionLogActionLog extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     params: Schema.Attribute.JSON;
     publishedAt: Schema.Attribute.DateTime;
+    resolved_request: Schema.Attribute.JSON;
     response: Schema.Attribute.JSON;
     source: Schema.Attribute.Enumeration<['dashboard', 'mcp', 'unknown']> &
       Schema.Attribute.DefaultTo<'unknown'>;

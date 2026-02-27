@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { ChevronDown, ChevronRight, Globe, Terminal, Layers, RefreshCw, Monitor, Server } from "lucide-react";
+import { ChevronDown, ChevronRight, Globe, Terminal, Layers, RefreshCw, Monitor, Server, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -47,6 +47,83 @@ function formatDuration(ms: number | null) {
   if (ms === null) return "-";
   if (ms < 1000) return `${ms}ms`;
   return `${(ms / 1000).toFixed(1)}s`;
+}
+
+function ResolvedRequestPanel({ log }: { log: ActionLog }) {
+  const req = log.resolved_request;
+  if (!req) return null;
+
+  // API request
+  if (log.action_type === "api" && req.method && req.url) {
+    return (
+      <div className="space-y-2">
+        <div className="flex items-center gap-2">
+          <Globe className="h-3.5 w-3.5 text-blue-500" />
+          <code className="text-xs font-semibold">
+            <span className="text-emerald-600 dark:text-emerald-400">{String(req.method)}</span>{" "}
+            <span className="text-muted-foreground break-all">{String(req.url)}</span>
+          </code>
+        </div>
+        {req.headers && typeof req.headers === "object" && Object.keys(req.headers).length > 0 && (
+          <div>
+            <p className="text-[10px] font-semibold uppercase text-muted-foreground mb-1">Headers</p>
+            <pre className="text-xs text-muted-foreground bg-muted p-2 rounded overflow-auto max-h-32">
+              {Object.entries(req.headers as Record<string, string>)
+                .map(([k, v]) => `${k}: ${v}`)
+                .join("\n")}
+            </pre>
+          </div>
+        )}
+        {req.body && (
+          <div>
+            <p className="text-[10px] font-semibold uppercase text-muted-foreground mb-1">Body</p>
+            <pre className="text-xs text-muted-foreground bg-muted p-2 rounded overflow-auto max-h-32">
+              {String(req.body)}
+            </pre>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Bash request
+  if (log.action_type === "bash" && req.command) {
+    return (
+      <div className="flex items-center gap-2">
+        <Terminal className="h-3.5 w-3.5 text-amber-500" />
+        <code className="text-xs text-muted-foreground break-all">
+          <span className="text-amber-600 dark:text-amber-400">$</span> {String(req.command)}
+        </code>
+      </div>
+    );
+  }
+
+  // Composite request
+  if (log.action_type === "composite" && Array.isArray(req.steps)) {
+    return (
+      <div className="space-y-2">
+        <Layers className="h-3.5 w-3.5 text-violet-500" />
+        {(req.steps as any[]).map((step, i) => (
+          <div key={i} className="text-xs bg-muted p-2 rounded">
+            <span className="font-semibold text-violet-600 dark:text-violet-400">Step {i + 1}:</span>{" "}
+            <span className="font-medium">{step.action}</span>
+            {step.params && Object.keys(step.params).length > 0 && (
+              <pre className="text-muted-foreground mt-1 overflow-auto">
+                {JSON.stringify(step.params, null, 2)}
+              </pre>
+            )}
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  // Fallback: raw JSON
+  return (
+    <pre className="text-xs text-muted-foreground bg-muted p-2 rounded overflow-auto max-h-40">
+      {JSON.stringify(req, null, 2)}
+    </pre>
+  );
 }
 
 export default function HistoryPage() {
@@ -216,6 +293,17 @@ export default function HistoryPage() {
                     <TableRow key={`${log.id}-detail`}>
                       <TableCell colSpan={8} className="bg-muted/30 p-4">
                         <div className="grid grid-cols-2 gap-4">
+                          {log.resolved_request && (
+                            <div className="col-span-2">
+                              <h4 className="text-xs font-semibold uppercase text-orange-600 dark:text-orange-400 mb-1 flex items-center gap-1">
+                                <Send className="h-3 w-3" />
+                                Request
+                              </h4>
+                              <div className="bg-muted rounded p-2">
+                                <ResolvedRequestPanel log={log} />
+                              </div>
+                            </div>
+                          )}
                           <div>
                             <h4 className="text-xs font-semibold uppercase text-muted-foreground mb-1">
                               Parameters

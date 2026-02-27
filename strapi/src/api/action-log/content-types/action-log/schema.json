@@ -42,6 +42,9 @@
       "type": "enumeration",
       "enum": ["dashboard", "mcp", "unknown"],
       "default": "unknown"
+    },
+    "resolved_request": {
+      "type": "json"
     }
   }
 }
